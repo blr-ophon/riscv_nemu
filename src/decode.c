@@ -75,7 +75,7 @@ int ParseInstruction(uint32_t instruction){
         case 0x17:  //AUIPC
             p_inst.type = INST_TYPE_U;
             p_inst.rd = (instruction >> 7) & 0x1f;
-            //TODO: Immediate
+            p_inst.imm = (instruction >> 12);
             break;
         default:
             rv = -1;

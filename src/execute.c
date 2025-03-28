@@ -20,19 +20,19 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
             }
             break;
         case 0x4:   // XOR
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = rs1 ^ rs2;
             break;
         case 0x6:   // OR
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = rs1 | rs2;
             break;
         case 0x7:   // AND
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = rs1 & rs2;
             break;
         case 0x1:   // SLL
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = rs1 << rs2;
             break;
         case 0x5:   // SRL / SRA
@@ -49,11 +49,11 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
             }
             break;
         case 0x2:   // SLT
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = ((int32_t) rs1 < (int32_t) rs2)? 1 : 0;
             break;
         case 0x3:   // SLTU
-            rv = p_inst->func7 == 0x00? 0 : 1;
+            rv = p_inst->func7 == 0x00? 0 : -1;
             *rd = (rs1 < rs2)? 1 : 0;
             break;
         default:
@@ -71,7 +71,7 @@ int ExecuteI_Aluopi(RVCore *core, ParsedInstruction *p_inst){
     uint32_t x0_dummy;
     uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
-    uint32_t imm = p_inst->imm == 0? 0 : p_inst->imm;
+    uint32_t imm = p_inst->imm;
 
     switch(p_inst->func3){ 
         case 0x0:   // ADDI
@@ -127,7 +127,7 @@ int ExecuteI_Load(RVCore *core, ParsedInstruction *p_inst){
     uint32_t x0_dummy;
     uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
-    uint32_t imm = p_inst->imm == 0? 0 : p_inst->imm;
+    uint32_t imm = p_inst->imm;
 
     switch(p_inst->func3){
         case 0x0:   // LB
@@ -157,11 +157,11 @@ int ExecuteI_Load(RVCore *core, ParsedInstruction *p_inst){
 }
 
 
-int Execute_Store(RVCore *core, ParsedInstruction *p_inst){
+int ExecuteS_Store(RVCore *core, ParsedInstruction *p_inst){
     int rv = 0;
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
-    uint32_t imm = p_inst->imm == 0? 0 : p_inst->imm;
+    uint32_t imm = p_inst->imm;
 
     switch(p_inst->func3){
         case 0x0:   // SB
@@ -178,11 +178,12 @@ int Execute_Store(RVCore *core, ParsedInstruction *p_inst){
     return rv;
 }
 
-int Execute_Branch(RVCore *core, ParsedInstruction *p_inst){
+
+int ExecuteB_Branch(RVCore *core, ParsedInstruction *p_inst){
     int rv = 0;
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
-    uint32_t imm = p_inst->imm == 0? 0 : p_inst->imm;
+    uint32_t imm = p_inst->imm;
 
     switch(p_inst->func3){
         case 0x0:   // BEQ
@@ -204,5 +205,120 @@ int Execute_Branch(RVCore *core, ParsedInstruction *p_inst){
             if(rs1 >= rs2) core->pc += imm;
             break;
     }
+    return rv;
+}
+
+
+int ExecuteJ_JAL(RVCore *core, ParsedInstruction *p_inst){
+    int rv = 0;
+    uint32_t x0_dummy;
+    uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
+    uint32_t imm = p_inst->imm;
+
+    *rd = core->pc + 4;
+    core->pc += imm;
+    return rv;
+}
+
+
+int ExecuteJ_JALR(RVCore *core, ParsedInstruction *p_inst){
+    int rv = 0;
+    uint32_t x0_dummy;
+    uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
+    uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
+    uint32_t imm = p_inst->imm;
+
+    *rd = core->pc + 4;
+    core->pc = rs1 + imm;
+
+    rv = p_inst->func3 == 0? 0 : -1;
+    return rv;
+}
+
+
+int ExecuteU_LUI(RVCore *core, ParsedInstruction *p_inst){
+    int rv = 0;
+    uint32_t x0_dummy;
+    uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
+    uint32_t imm = p_inst->imm;
+
+    *rd = imm << 12;
+
+    return rv;
+}
+
+int ExecuteU_AUIPC(RVCore *core, ParsedInstruction *p_inst){
+    int rv = 0;
+    uint32_t x0_dummy;
+    uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
+    uint32_t imm = p_inst->imm;
+
+    *rd = core->pc + (imm << 12);
+
+    return rv;
+}
+
+int ExecuteR_MUL(RVCore *core, ParsedInstruction *p_inst){ 
+    int rv = 0;
+    uint32_t x0_dummy;
+    uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
+    uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
+    uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
+
+    switch(p_inst->func3){
+        case 0x0:   // MUL
+            {
+            uint64_t result = (int32_t)rs1 * (int32_t)rs2;
+            *rd = result;
+            break;
+            }
+        case 0x1:   // MULH
+            {
+            uint64_t result = (int32_t)rs1 * (int32_t)rs2;
+            *rd = result >> 32;
+            break;
+            }
+        case 0x2:   // MULHSU
+            {
+            uint64_t result = ((int32_t) rs1) * rs2;
+            *rd = result >> 32;
+            break;
+            }
+        case 0x3:   // MULHU
+            {
+            uint64_t result = rs1 * rs2;
+            *rd = result >> 32;
+            break;
+            }
+        case 0x4:   // DIV
+            if(rs2 != 0){
+                *rd = (int32_t)rs1 / (int32_t)rs2;
+            }else{
+                rv = -1;
+            }
+            break;
+        case 0x5:   // DIVU
+            if(rs2 != 0){
+                *rd = rs1 / rs2;
+            }else{
+                rv = -1;
+            }
+            break;
+        case 0x6:   // REM
+            if(rs2 != 0){
+                *rd = (int32_t)rs1 % (int32_t)rs2;
+            }else{
+                rv = -1;
+            }
+            break;
+        case 0x7:   // REMU
+            if(rs2 != 0){
+                *rd = rs1 % rs2;
+            }else{
+                rv = -1;
+            }
+            break;
+    }
+
     return rv;
 }
