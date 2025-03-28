@@ -1,39 +1,39 @@
 #include "cpu.h"
 
-static int Decode(RVCore *cpu, uint32_t instruction);
+static int Decode(RVCore *core, uint32_t instruction);
 
 int main(void){
-    RVCore *cpu = RVCore_Create(4*128, 0, 0);
+    RVCore *core = RVCore_Create(4*128, 0, 0);
 
-    RVCore_Run(cpu);
+    RVCore_Run(core);
 
-    RVCore_Destroy(cpu);
+    RVCore_Destroy(core);
 }
 
 
 RVCore *RVCore_Create(uint32_t mem_size, uint32_t mem_offset, uint32_t pc_start){
-    RVCore *cpu = malloc(sizeof(RVCore));
-    cpu->memory = calloc(mem_size/4, 4);
-    cpu->memSize = mem_size;
-    cpu->memOffset = mem_offset;
-    cpu->pc = pc_start;
+    RVCore *core = malloc(sizeof(RVCore));
+    core->memory = calloc(mem_size/4, 4);
+    core->memSize = mem_size;
+    core->memOffset = mem_offset;
+    core->pc = pc_start;
 
-    return cpu;
+    return core;
 }
 
 
-int RVCore_Run(RVCore *cpu){
-    if(cpu->pc > cpu->memSize){
+int RVCore_Run(RVCore *core){
+    if(core->pc > core->memSize){
         return -MEMFAULT;
     }
-    uint32_t instruction = cpu->memory[cpu->pc];
+    uint32_t instruction = core->memory[core->pc];
 }
 
 
-void RVCore_Destroy(RVCore *cpu){
-    free(cpu->memory);
-    free(cpu);
+void RVCore_Destroy(RVCore *core){
+    free(core->memory);
+    free(core);
 }
 
-static int Decode(RVCore *cpu, uint32_t instruction){
+static int Decode(RVCore *core, uint32_t instruction){
 }

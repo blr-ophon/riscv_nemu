@@ -20,8 +20,8 @@ typedef enum{
 }E_Exceptions;
 
 
-void RVCore_Destroy(RVCore *cpu);
+void RVCore_Destroy(RVCore *core);
 RVCore *RVCore_Create(uint32_t mem_size, uint32_t mem_offset, uint32_t pc_start);
-int RVCore_Run(RVCore *cpu);
+int RVCore_Run(RVCore *core);
 
 #endif
