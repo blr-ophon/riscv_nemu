@@ -1,0 +1,4 @@
+*.txt
+*.plist
+build/
+compile_commands.json
