@@ -3,7 +3,7 @@
 
 int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
     int rv = 0;
-    uint32_t x0_dummy;
+    uint32_t x0_dummy = 0;
     uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
@@ -68,7 +68,7 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
 
 int ExecuteI_Aluopi(RVCore *core, ParsedInstruction *p_inst){
     int rv = 0;
-    uint32_t x0_dummy;
+    uint32_t x0_dummy = 0;
     uint32_t *rd = p_inst->rd == 0? &x0_dummy : &core->gpr[p_inst->rd];
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t imm = p_inst->imm;

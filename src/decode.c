@@ -83,3 +83,24 @@ int ParseInstruction(uint32_t instruction){
 
     return rv;
 }
+
+
+int ParseInstruction_Comp(uint16_t instruction){
+    int rv = 0;
+    uint8_t opcode = instruction & 0x70;
+
+    ParsedInstruction p_inst;
+    memset(&p_inst, 0, sizeof(ParseInstruction));
+
+    switch(opcode){
+        case 0x2:   // LWSP, SWSP
+            break;
+        case 0x0:   // LW, SW
+            break;
+        case 0x1:   // J
+        default:
+            rv = -1;
+    }
+
+    return rv;
+}

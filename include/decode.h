@@ -13,6 +13,18 @@ typedef enum{
 }E_InstructionType;
 
 
+typedef enum{
+    INST_TYPE_CR,
+    INST_TYPE_CI,
+    INST_TYPE_CSS,
+    INST_TYPE_CIW,
+    INST_TYPE_CL,
+    INST_TYPE_CS,
+    INST_TYPE_CB,
+    INST_TYPE_CJ,
+}E_InstructionTypeComp;
+
+
 typedef struct{ 
     E_InstructionType type;
     uint8_t rd;
@@ -23,5 +35,15 @@ typedef struct{
     uint32_t imm;
 }ParsedInstruction;
 
+
+typedef struct{ 
+    E_InstructionType type;
+    uint8_t rd;
+    uint8_t rs1;
+    uint8_t rs2;
+    uint8_t func3;
+    uint8_t func4;
+    uint32_t imm;
+}ParsedInstructionComp;
 
 #endif
