@@ -2,7 +2,12 @@
 #define EXECUTE_H
 
 #include "cpu.h"
+#include "decode.h"
+#include "instructions.h"
 
-int ExecuteR(RVCore *core, ParsedInstruction *p_inst);
+int Execute32(RVCore *core, uint32_t instr, ParsedInstruction *p_instr);
+int Execute16(uint16_t instr, ParsedInstruction *p_instr);
+
 
 #endif
+

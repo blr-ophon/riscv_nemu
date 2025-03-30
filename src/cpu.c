@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "execute.h"
 
 static int Decode(RVCore *core, uint32_t instruction);
 
@@ -26,14 +27,18 @@ int RVCore_Run(RVCore *core){
     if(core->pc > core->memSize){
         return -MEMFAULT;
     }
-    uint32_t instruction = core->memory[core->pc];
+    uint32_t instr = core->memory[core->pc];
+
+    uint8_t opcode = instr & 0x3;
+    if(opcode == 0x3){      // 32 bit instructions
+        core->pc += 4;
+    }else{                  // Compressed instructions
+        core->pc += 2;
+    }
 }
 
 
 void RVCore_Destroy(RVCore *core){
     free(core->memory);
     free(core);
-}
-
-static int Decode(RVCore *core, uint32_t instruction){
 }

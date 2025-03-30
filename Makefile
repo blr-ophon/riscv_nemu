@@ -11,7 +11,7 @@ CFILES := $(wildcard ./src/*.c)
 CFILES := $(filter-out src/test.c, $(CFILES))
 OBJECTS := $(CFILES:$(CFILES_DIR)/%.c=$(BUILD_DIR)/%.o)
 
-MERGED_OBJECT := ./riscv_nemu.o
+MERGED_OBJECT := ${BUILD_DIR}/riscv_nemu.o
 EXEC := ./riscv_nemu
 
 ${EXEC}: ${MERGED_OBJECT}
