@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 typedef enum{
     INST_TYPE_R,
     INST_TYPE_I,
@@ -27,23 +28,17 @@ typedef enum{
 
 typedef struct{ 
     E_InstructionType type;
+    uint8_t opcode;
     uint8_t rd;
-    uint8_t func3;
+    uint8_t funct3;
     uint8_t rs1;
     uint8_t rs2;
-    uint8_t func7;
+    uint8_t funct7;
     uint32_t imm;
 }ParsedInstruction;
 
 
-typedef struct{ 
-    E_InstructionType type;
-    uint8_t rd;
-    uint8_t rs1;
-    uint8_t rs2;
-    uint8_t func3;
-    uint8_t func4;
-    uint32_t imm;
-}ParsedInstructionComp;
+int ParseInstruction(uint32_t instr);
+int ParseInstruction_Comp(uint16_t instr);
 
 #endif

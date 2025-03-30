@@ -8,11 +8,11 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
 
-    switch(p_inst->func3){ 
+    switch(p_inst->funct3){ 
         case 0x0:   // ADD/SUB
-            if(p_inst->func7 == 0x00){ 
+            if(p_inst->funct7 == 0x00){ 
                 *rd = rs1 + rs2;
-            }else if(p_inst->func7 == 0x20){
+            }else if(p_inst->funct7 == 0x20){
                 *rd = rs1 - rs2;
             }
             else{
@@ -20,25 +20,25 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
             }
             break;
         case 0x4:   // XOR
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = rs1 ^ rs2;
             break;
         case 0x6:   // OR
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = rs1 | rs2;
             break;
         case 0x7:   // AND
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = rs1 & rs2;
             break;
         case 0x1:   // SLL
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = rs1 << rs2;
             break;
         case 0x5:   // SRL / SRA
-            if(p_inst->func7 == 0x00){
+            if(p_inst->funct7 == 0x00){
                 *rd = rs1 >> rs2;
-            }else if(p_inst->func7 == 0x20){
+            }else if(p_inst->funct7 == 0x20){
                 uint32_t sign_mask = 0;
                 if((*rd) & (1 << 31)){
                     sign_mask = 0xffffffff << (32 - rs2);
@@ -49,11 +49,11 @@ int ExecuteR_Aluop(RVCore *core, ParsedInstruction *p_inst){
             }
             break;
         case 0x2:   // SLT
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = ((int32_t) rs1 < (int32_t) rs2)? 1 : 0;
             break;
         case 0x3:   // SLTU
-            rv = p_inst->func7 == 0x00? 0 : -1;
+            rv = p_inst->funct7 == 0x00? 0 : -1;
             *rd = (rs1 < rs2)? 1 : 0;
             break;
         default:
@@ -73,7 +73,7 @@ int ExecuteI_Aluopi(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t imm = p_inst->imm;
 
-    switch(p_inst->func3){ 
+    switch(p_inst->funct3){ 
         case 0x0:   // ADDI
             *rd = rs1 + imm;
             break;
@@ -94,9 +94,9 @@ int ExecuteI_Aluopi(RVCore *core, ParsedInstruction *p_inst){
             }
             break;
         case 0x5:   // SRL / SRA
-            if(p_inst->func7 == 0x00){
+            if(p_inst->funct7 == 0x00){
                 *rd = rs1 >> imm;
-            }else if(p_inst->func7 == 0x20){
+            }else if(p_inst->funct7 == 0x20){
                 imm &= 0x1f;
                 uint32_t sign_mask = 0;
                 if((*rd) & (1 << 31)){
@@ -129,7 +129,7 @@ int ExecuteI_Load(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t imm = p_inst->imm;
 
-    switch(p_inst->func3){
+    switch(p_inst->funct3){
         case 0x0:   // LB
             *rd = (core->memory[rs1 + imm]) & 0xff;
             if(*rd & (1 << 7)){
@@ -163,7 +163,7 @@ int ExecuteS_Store(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
     uint32_t imm = p_inst->imm;
 
-    switch(p_inst->func3){
+    switch(p_inst->funct3){
         case 0x0:   // SB
             core->memory[rs1+imm] = rs2 & 0xff;
             break;
@@ -185,7 +185,7 @@ int ExecuteB_Branch(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
     uint32_t imm = p_inst->imm;
 
-    switch(p_inst->func3){
+    switch(p_inst->funct3){
         case 0x0:   // BEQ
             if(rs1 == rs2) core->pc += imm;
             break;
@@ -231,7 +231,7 @@ int ExecuteJ_JALR(RVCore *core, ParsedInstruction *p_inst){
     *rd = core->pc + 4;
     core->pc = rs1 + imm;
 
-    rv = p_inst->func3 == 0? 0 : -1;
+    rv = p_inst->funct3 == 0? 0 : -1;
     return rv;
 }
 
@@ -265,7 +265,7 @@ int ExecuteR_MUL(RVCore *core, ParsedInstruction *p_inst){
     uint32_t rs1 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs1];
     uint32_t rs2 = p_inst->rd == 0? 0 : core->gpr[p_inst->rs2];
 
-    switch(p_inst->func3){
+    switch(p_inst->funct3){
         case 0x0:   // MUL
             {
             uint64_t result = (int32_t)rs1 * (int32_t)rs2;
