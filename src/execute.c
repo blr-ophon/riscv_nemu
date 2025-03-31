@@ -183,7 +183,7 @@ int Execute16(uint16_t instr, ParsedInstruction *p_instr){
         //CJ
         case 0b10101:   // j
         case 0b00101:   // jal, addiw
-            p_instr->imm |= (instr & 0x31) >> 2;          // imm[3:1]
+            p_instr->imm |= (instr & 0x38) >> 2;          // imm[3:1]
             p_instr->imm |= (instr & (1 << 11)) >> 7;     // imm[4]
             p_instr->imm |= (instr & (1 << 2)) << 3;      // imm[5]
             p_instr->imm |= (instr & (1 << 7)) >> 1;      // imm[6]
